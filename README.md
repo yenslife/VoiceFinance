@@ -25,3 +25,7 @@ brew install portaudio
 ```bash
 pip install -r requirements.txt
 ```
+
+### API key
+
+請自行到 Groq 上取得 API key，並參考 `backend/.env.example` 來設定 API_KEY，將資料寫入 `backend/.env` 中。
