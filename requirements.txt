@@ -4,3 +4,8 @@ requests
 pyaudio
 fastapi
 dotenv
+py3-tts
+uvicorn
+json
+pydub
+opencc-python-reimplemented

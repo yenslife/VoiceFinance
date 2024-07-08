@@ -14,10 +14,11 @@ VoiceFinance 是一個語音記帳系統，可以通過說話的方式來記錄�
 
 ## 安裝
 
-如果使用 MacOS 系統，你會需要先安裝 portaudio 才能使用 pyaudio。
+如果使用 MacOS 系統，你會需要先安裝 portaudio 才能使用 pyaudio。其他系統請參考 pyaudio 的安裝說明。
 
 ```bash
 brew install portaudio
+brew install ffmpeg
 ```
 
 安裝需要的套件
@@ -25,6 +26,10 @@ brew install portaudio
 ```bash
 pip install -r requirements.txt
 ```
+
+### 注意事項
+- pyttsx3 可能要換 py3-tts 才不會遇到[問題](https://stackoverflow.com/questions/77197398/error-running-pyttsx3-code-on-os-x-nameerror-name-objc-is-not-defined)
+- 使用 `save_to_file` 函式時，需要將副檔名指定為 wav 才不會出錯
 
 ### API key
 
