@@ -1,6 +1,5 @@
 import flet as ft
 import requests
-import json
 import pyaudio
 import wave
 import threading

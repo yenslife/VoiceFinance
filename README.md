@@ -11,3 +11,17 @@ VoiceFinance 是一個語音記帳系統，可以通過說話的方式來記錄�
 - 語音輸入記帳
 - 自動識別日期、時間和金額
 - 使用 JSON 格式來儲存資料
+
+## 安裝
+
+如果使用 MacOS 系統，你會需要先安裝 portaudio 才能使用 pyaudio。
+
+```bash
+brew install portaudio
+```
+
+安裝需要的套件
+
+```bash
+pip install -r requirements.txt
+```
