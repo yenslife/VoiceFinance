@@ -29,3 +29,7 @@ pip install -r requirements.txt
 ### API key
 
 請自行到 Groq 上取得 API key，並參考 `backend/.env.example` 來設定 API_KEY，將資料寫入 `backend/.env` 中。
+
+## Inspiration
+
+[用文字生成打造下一代的使用者體驗 @ Let's visionOS 2024](https://youtu.be/obRTOtKp8OQ?si=3G4PEgkthYuYquRZ)
