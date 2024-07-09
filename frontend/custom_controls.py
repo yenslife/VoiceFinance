@@ -1,36 +1,60 @@
 import flet as ft
-class Task(ft.Row):
-    def __init__(self, text):
+import requests
+from api import API_URL
+class Item(ft.Row):
+    def __init__(self, name, amount, location, date, create_at, id):
         super().__init__()
-        self.text_view = ft.Text(text)
-        self.text_edit = ft.TextField(text, visible=False)
+        self.name_text = ft.Text(name)
+        self.amount_text = ft.Text(amount)
+        self.location_text = ft.Text(location)
+        self.date_text = ft.Text(date)
+        self.create_at_text = ft.Text(create_at)
+        self.id = id,
+        self.text_edit = ft.TextField(name, visible=False, width=100)
         self.edit_button = ft.IconButton(icon=ft.icons.EDIT, on_click=self.edit)
         self.save_button = ft.IconButton(
             visible=False, icon=ft.icons.SAVE, on_click=self.save
         )
         self.controls = [
-            ft.Checkbox(),
-            self.text_view,
-            self.text_edit,
-            self.edit_button,
-            self.save_button,
+            ft.Row(
+                [
+                    ft.Checkbox(),
+                    self.name_text,
+                    self.text_edit,
+                    self.amount_text,
+                    self.location_text,
+                    self.date_text,
+                    self.create_at_text,
+                    self.edit_button,
+                    self.save_button
+                ]
+            )
         ]
 
     def edit(self, e):
         self.edit_button.visible = False
         self.save_button.visible = True
-        self.text_view.visible = False
+        self.name_text.visible = False
         self.text_edit.visible = True
         self.update()
 
     def save(self, e):
         self.edit_button.visible = True
         self.save_button.visible = False
-        self.text_view.visible = True
+        self.name_text.visible = True
         self.text_edit.visible = False
-        self.text_view.value = self.text_edit.value
+        self.name_text.value = self.text_edit.value
+        print(f"id = {self.id}")
+        print(f"self.name_text.value = {self.name_text.value}")
+        print(f"self.amount_text.value = {self.amount_text.value}")
+        print(f"self.location_text.value = {self.location_text.value}")
+        print(f"self.date_text.value = {self.date_text.value}")
+        print(f"self.create_at_text.value = {self.create_at_text.value}")
+        response = requests.put(
+            API_URL + "/items/" + str(self.id[0]), json={"name": self.text_edit.value, "amount": self.amount_text.value, "location": self.location_text.value, "date": self.date_text.value, "create_at": self.create_at_text.value}
+        )
+        print(response.json())
         self.update()
-
 class AppBar(ft.AppBar):
     def __init__(self, title="Voice Finance 你的語音記帳系統", page: ft.Page = None):
         super().__init__()

@@ -67,6 +67,11 @@ def search_items(name: str, db: Session = Depends(get_db)):
 def delete_item(item_id: int, db: Session = Depends(get_db)):
     return crud.delete_item(db, item_id=item_id)
 
+# edit item
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: models.ItemBase, db: Session = Depends(get_db)):
+    return crud.update_item(db, item_id, item)
+
 @app.post("/speech_to_text")
 async def speech_to_text(audio_data: UploadFile = File(...)):
     audio_content = await audio_data.read()

@@ -17,11 +17,13 @@ class Item(Base):
 from pydantic import BaseModel
 from typing import Optional
 
+today = date.today()
+
 class ItemBase(BaseModel):
     name: str
-    location: str
-    date: date
-    amount: int
+    location: Optional[str] = None
+    _date: Optional[date] = today
+    amount: int = 0
     create_at: Optional[datetime] = None
     class Config:
         orm_mode = True

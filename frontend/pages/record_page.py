@@ -8,7 +8,8 @@ import opencc
 # components
 from custom_controls import AppBar
 
-API_URL = "http://127.0.0.1:8000"
+# api
+from api import API_URL
 
 # 錄音狀態
 is_recording = False

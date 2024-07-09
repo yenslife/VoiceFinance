@@ -25,3 +25,8 @@ def delete_item(db: Session, item_id: int):
     db.query(models.Item).filter(models.Item.id == item_id).delete()
     db.commit()
     return {"message": "Delete successfully"}
+
+def update_item(db: Session, item_id: int, item: models.ItemBase):
+    db.query(models.Item).filter(models.Item.id == item_id).update(item.model_dump())
+    db.commit()
+    return {"message": "Update successfully"}
