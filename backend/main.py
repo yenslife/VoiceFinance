@@ -1,7 +1,12 @@
 import fastapi
 from fastapi.responses import FileResponse
 from fastapi.exceptions import HTTPException
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, Depends
+from sqlalchemy.orm import Session
+import crud, models
+from database import SessionLocal, engine
+from datetime import datetime
+
 from groq import Groq
 import pyttsx3
 from rich import print
@@ -23,8 +28,44 @@ client = Groq(
     api_key=api_key,
 )
 
+# dependencies
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Create the database tables
+models.Base.metadata.create_all(bind=engine)
+
 # Create a FastAPI instance
 app = fastapi.FastAPI()
+
+@app.post("/items", response_model=models.ItemBase)
+def create_item(item: models.ItemBase, db: Session = Depends(get_db)):
+    return crud.create_item(db, item)
+
+@app.get("/items")
+def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    items = crud.get_items(db, skip=skip, limit=limit)
+    return items
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, db: Session = Depends(get_db)):
+    item = crud.get_item(db, item_id=item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return item
+
+@app.get("/search_items")
+def search_items(name: str, db: Session = Depends(get_db)):
+    items = crud.search_items(db, name)
+    return items
+
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int, db: Session = Depends(get_db)):
+    return crud.delete_item(db, item_id=item_id)
 
 @app.post("/speech_to_text")
 async def speech_to_text(audio_data: UploadFile = File(...)):
@@ -69,7 +110,7 @@ async def text_to_speech(text: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/accounting")
-async def accounting(text: str):
+async def accounting(text: str, db: Session = Depends(get_db)):
     """
     記帳服務，使用 LLM 判斷給定的文字是否為記帳相關的內容，如果是，判斷日期、金額、地點、類別等訊息
     """
@@ -105,4 +146,16 @@ async def accounting(text: str):
         raise HTTPException(status_code=500, detail=str(e))
     print(chat_completion.choices[0].message.content)
     result_json = json.loads(chat_completion.choices[0].message.content)
-    return {"message": f"{result_json}"}
+    message_str = str(result_json).replace("'", "").replace(", ", "\n").replace("{", "").replace("}", "").replace(":", "：")
+    message_str = message_str.replace('date', '日期').replace('amount', '金額').replace('location', '地點').replace('item', '物品')
+
+    # add to database
+    item = models.ItemBase(name=result_json["item"],
+                            location=result_json["location"],
+                            date=result_json["date"], 
+                            amount=result_json["amount"],
+                            create_at=datetime.now())
+    print(item)
+    crud.create_item(db, item)
+
+    return {"message": f"已經將資料儲存到資料庫\n{message_str}"}

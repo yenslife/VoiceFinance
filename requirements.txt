@@ -9,3 +9,5 @@ uvicorn
 json
 pydub
 opencc-python-reimplemented
+sqlalchemy
+sqlite3
