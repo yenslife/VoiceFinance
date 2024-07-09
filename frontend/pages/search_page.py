@@ -22,7 +22,7 @@ def search_page(page: ft.Page):
             item_obj = Item(name=item['name'], 
                             amount=item['amount'], 
                             location=item['location'], 
-                            date=item['date'], 
+                            date=item['date_'], 
                             create_at=item['create_at'], 
                             id=item['id'],
                             note=item['note'])

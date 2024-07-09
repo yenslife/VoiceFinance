@@ -4,6 +4,7 @@ import pyaudio
 import wave
 import threading
 import opencc
+from datetime import datetime
 
 # components
 from custom_controls import AppBar
@@ -23,7 +24,7 @@ RATE = 44100  # 錄音取樣率
 CHUNK = 1024  # 每次讀取的音頻塊大小
 WAVE_OUTPUT_FILENAME = "output.wav"  # 輸出文件名
 
-def start_recording_thread():
+def start_recording_thread(query_text_field, page: ft.Page):
     global is_recording, audio_data, stream, p, result_text
     audio_data = []
     p = pyaudio.PyAudio()
@@ -52,28 +53,63 @@ def start_recording_thread():
     response = requests.post(API_URL + "/speech_to_text", files=file)
     result_text = response.json()['text']
     print(f"辨識結果: {result_text}")
-
-def update_result_text(query_text_field: ft.Text, page: ft.Page):
-    global result_text
-    while result_text == "":
-        query_text_field.value = result_text
-    # 簡體字轉繁體字
     cc = opencc.OpenCC('s2twp')
     result_text = cc.convert(result_text)
+    print(f"繁體轉換結果: {result_text}")
     query_text_field.value = result_text
-    result_text = ""
     page.update()
-    print("update result text done")
-
 
 def recording_page(page: ft.Page):
     # functions
-    def accounting(e):
+    def analysis(e):
         url = API_URL + "/accounting"
-        params = {'text': query_text_field.value}
-        response = requests.get(url, params=params)
-        result_text.value = response.json()["message"]
-        print(response.json()["message"])
+        params = {
+            "text": query_text_field.value
+        }
+        response = requests.post(url, params=params)
+        print(response.json())
+        if query_text_field.value != "":
+            result_table.rows = [
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(response.json()["message"]['item'])),
+                        ft.DataCell(ft.Text(response.json()["message"]['date'])),
+                        ft.DataCell(ft.Text(response.json()["message"]['amount'])),
+                        ft.DataCell(ft.Text(response.json()["message"]['location'])),
+                        ft.DataCell(ft.Text(response.json()["message"]['note'])),
+                    ],
+                )
+            ]
+        elif query_text_field.value == "":
+            result_table.rows = []
+        page.update()
+
+    def add_to_db(e):
+        url = API_URL + "/items"
+        print(result_table)
+        try:
+            json_data = {
+                "name": result_table.rows[0].cells[0].content.value,
+                "date": result_table.rows[0].cells[1].content.value,
+                "amount": result_table.rows[0].cells[2].content.value,
+                "location": result_table.rows[0].cells[3].content.value,
+                "note": result_table.rows[0].cells[4].content.value,
+                "create_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+        except IndexError:
+            print("no data")
+            add_to_db_snackbar.content = ft.Text("請先進行解析!!!")
+            add_to_db_snackbar.open = True
+            page.update()
+            return
+        response = requests.post(url, json=json_data)
+        if response.status_code == 200:
+            print(f"add to db: {json_data}")
+            add_to_db_snackbar.content = ft.Text("加入資料庫成功")
+            add_to_db_snackbar.open = True
+        else:
+            add_to_db_snackbar.content = ft.Text("加入資料庫失敗")
+            add_to_db_snackbar.open = True
         page.update()
 
     def start_recording(e):
@@ -81,24 +117,37 @@ def recording_page(page: ft.Page):
         if is_recording:
             return
         is_recording = True
-        threading.Thread(target=start_recording_thread).start()
+        threading.Thread(target=start_recording_thread, args=(query_text_field, page)).start()
     
     def stop_recording(e):
         global is_recording, result_text
         is_recording = False
-        threading.Thread(target=update_result_text, args=(query_text_field, page)).start()
+        print("stop recording")
 
     # text veiw
     appbar = AppBar(page=page)
     start_hint_text = ft.Text("請錄下你的花費以及時間", size=18)
     end_hint_text = ft.Text("當錄音結束，按下這個按鈕", size=18)
-    query_text_field = ft.TextField("")
-    result_text = ft.Text("result")
+    query_text_field = ft.TextField("我昨天買了五隻筆，花了九十塊")
+    result_table = ft.DataTable(
+        columns=[
+            ft.DataColumn(ft.Text("Item")),
+            ft.DataColumn(ft.Text("Date")),
+            ft.DataColumn(ft.Text("Amount")),
+            ft.DataColumn(ft.Text("Location")),
+            ft.DataColumn(ft.Text("Note"))
+        ],
+        rows=[]
+    )
 
     # calculate button
     start_recording_btn = ft.ElevatedButton(text=f"start recording", width=630, on_click=start_recording)
     stop_recording_btn = ft.ElevatedButton(text=f"stop recording", width=630, on_click=stop_recording)
-    test_btn = ft.ElevatedButton(text=f"確定記帳", width=630, on_click=accounting)
+    analysis_btn = ft.ElevatedButton(text=f"解析", width=630, on_click=analysis)
+    add_to_db_btn = ft.ElevatedButton(text=f"加入資料庫", width=630, on_click=add_to_db)
+
+    # snackbar
+    add_to_db_snackbar = ft.SnackBar(ft.Text("加入資料庫成功"), action="關閉")
     
     page.views.append(
         ft.View(
@@ -116,8 +165,10 @@ def recording_page(page: ft.Page):
                     ],
                     alignment=ft.MainAxisAlignment.CENTER
                 ),
-                test_btn,
-                result_text
+                analysis_btn,
+                result_table,
+                add_to_db_btn,
+                add_to_db_snackbar
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.CENTER

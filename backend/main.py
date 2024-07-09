@@ -114,7 +114,7 @@ async def text_to_speech(text: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/accounting")
+@app.post("/accounting")
 async def accounting(text: str, db: Session = Depends(get_db)):
     """
     記帳服務，使用 LLM 判斷給定的文字是否為記帳相關的內容，如果是，判斷日期、金額、地點、類別等訊息
@@ -151,17 +151,5 @@ async def accounting(text: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     print(chat_completion.choices[0].message.content)
     result_json = json.loads(chat_completion.choices[0].message.content)
-    message_str = str(result_json).replace("'", "").replace(", ", "\n").replace("{", "").replace("}", "").replace(":", "：")
-    message_str = message_str.replace('date', '日期').replace('amount', '金額').replace('location', '地點').replace('item', '物品')
 
-    # add to database
-    item = models.ItemBase(name=result_json["item"],
-                            location=result_json["location"],
-                            date=result_json["date"], 
-                            amount=result_json["amount"],
-                            create_at=datetime.now(),
-                            note=result_json["note"])
-    print(item)
-    crud.create_item(db, item)
-
-    return {"message": f"已經將資料儲存到資料庫\n{message_str}"}
+    return {"message": result_json}
