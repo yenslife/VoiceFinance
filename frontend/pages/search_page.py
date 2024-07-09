@@ -19,7 +19,13 @@ def search_page(page: ft.Page):
         item_list_view.controls = []
         for item in response:
             print(item)
-            item_obj = Item(name=item['name'], amount=item['amount'], location=item['location'], date=item['date'], create_at=item['create_at'], id=item['id'])
+            item_obj = Item(name=item['name'], 
+                            amount=item['amount'], 
+                            location=item['location'], 
+                            date=item['date'], 
+                            create_at=item['create_at'], 
+                            id=item['id'],
+                            note=item['note'])
             items.append(item_obj)
         item_list_view.controls.extend(items)
         page.update()
@@ -30,12 +36,15 @@ def search_page(page: ft.Page):
         width=600
     )
 
+    search(None)
+
     header_row = ft.Row([
-        ft.Text("Name", weight=ft.FontWeight.BOLD, width=150),
+        ft.Text("Name", weight=ft.FontWeight.BOLD, width=100),
         ft.Text("Amount", weight=ft.FontWeight.BOLD, width=100),
         ft.Text("Location", weight=ft.FontWeight.BOLD, width=150),
         ft.Text("Date", weight=ft.FontWeight.BOLD, width=100),
-        ft.Text("Create At", weight=ft.FontWeight.BOLD, width=150)
+        ft.Text("Create At", weight=ft.FontWeight.BOLD, width=150),
+        ft.Text("Note", weight=ft.FontWeight.BOLD, width=100)
     ])
 
     view_list = [ appbar,
@@ -49,6 +58,6 @@ def search_page(page: ft.Page):
         ft.View(
             "/search",
             view_list,
-            # horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER
         )
     )

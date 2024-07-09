@@ -38,7 +38,7 @@ def information_extraction(text):
         dates[last_weekday_names_1[i]] = (today - timedelta(days=today.weekday() - i + 7)).strftime("%Y-%m-%d")
     print(dates)
     nl = "\n"
-    prompt = f"""請提取以下文字中的日期、金額、地點等訊息，並回傳結果：
+    prompt = f"""請提取以下文字中的日期、金額、地點、備註等訊息，並回傳結果：
 '''{text}'''
 使用 json 格式回傳提取的結果，例如：
 範例一：
@@ -47,6 +47,7 @@ def information_extraction(text):
     "amount": 200,
     "location": "彰化",
     "item": "牛肉麵",
+    "note": "和朋友一起吃"
 }}
 範例二：
 {{
@@ -54,6 +55,7 @@ def information_extraction(text):
     "amount": 150,
     "location": "台北",
     "item": "義大利麵",
+    "note": "使用信用卡付款"
 }}
 如果沒有辦法判斷出日期、金額、地點、類別等訊息，請將該項目設為空字串 \"\"，例如：
 {{
@@ -61,6 +63,7 @@ def information_extraction(text):
     "amount": "119",
     "location": "",
     "item": "申請會員卡",
+    "note": ""
 }}
 
 當出現以下日期時，請回傳對應的日期：
@@ -86,6 +89,15 @@ def information_extraction(text):
 ###其他常用語句###
 花了：購買
 買了：購買
+
+###備註的例子###
+- 和妹妹一起去，當天下雨
+- 特別好吃，但是店員的臉很臭
+- 用現金付款，結帳的阿姨找錢很慢
+- 用信用卡付款
+- 用行動支付付款，還有折扣
+- 當天雨很大，衣服都濕了
+- 人很多，又很吵，吃得很不開心
 
 請只回傳 json 格式的內容，不要有其他文字。
 """

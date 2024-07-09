@@ -2,13 +2,14 @@ import flet as ft
 import requests
 from api import API_URL
 class Item(ft.Row):
-    def __init__(self, name, amount, location, date, create_at, id):
+    def __init__(self, name, amount, location, date, create_at, id, note):
         super().__init__()
         self.name_text = ft.Text(name)
         self.amount_text = ft.Text(amount)
         self.location_text = ft.Text(location)
         self.date_text = ft.Text(date)
         self.create_at_text = ft.Text(create_at)
+        self.note_text = ft.Text(note)
         self.id = id,
         self.text_edit = ft.TextField(name, visible=False, width=100)
         self.edit_button = ft.IconButton(icon=ft.icons.EDIT, on_click=self.edit)
@@ -25,6 +26,7 @@ class Item(ft.Row):
                     self.location_text,
                     self.date_text,
                     self.create_at_text,
+                    self.note_text,
                     self.edit_button,
                     self.save_button
                 ]
@@ -44,14 +46,15 @@ class Item(ft.Row):
         self.name_text.visible = True
         self.text_edit.visible = False
         self.name_text.value = self.text_edit.value
-        print(f"id = {self.id}")
-        print(f"self.name_text.value = {self.name_text.value}")
-        print(f"self.amount_text.value = {self.amount_text.value}")
-        print(f"self.location_text.value = {self.location_text.value}")
-        print(f"self.date_text.value = {self.date_text.value}")
-        print(f"self.create_at_text.value = {self.create_at_text.value}")
         response = requests.put(
-            API_URL + "/items/" + str(self.id[0]), json={"name": self.text_edit.value, "amount": self.amount_text.value, "location": self.location_text.value, "date": self.date_text.value, "create_at": self.create_at_text.value}
+            API_URL + "/items/" + str(self.id[0]), json={
+                "name": self.text_edit.value, 
+                "amount": self.amount_text.value, 
+                "location": self.location_text.value, 
+                "date": self.date_text.value, 
+                "create_at": self.create_at_text.value,
+                "note": self.note_text.value
+                }
         )
         print(response.json())
         self.update()

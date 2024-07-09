@@ -12,6 +12,7 @@ class Item(Base):
     date = Column(DateTime, index=True)
     amount = Column(Integer, index=True)
     create_at = Column(DateTime, default=datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+    note = Column(String, index=True)
 
 # Pydantic model
 from pydantic import BaseModel
@@ -25,5 +26,6 @@ class ItemBase(BaseModel):
     _date: Optional[date] = today
     amount: int = 0
     create_at: Optional[datetime] = None
+    note: Optional[str] = None
     class Config:
         orm_mode = True

@@ -159,7 +159,8 @@ async def accounting(text: str, db: Session = Depends(get_db)):
                             location=result_json["location"],
                             date=result_json["date"], 
                             amount=result_json["amount"],
-                            create_at=datetime.now())
+                            create_at=datetime.now(),
+                            note=result_json["note"])
     print(item)
     crud.create_item(db, item)
 
