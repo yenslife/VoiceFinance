@@ -29,6 +29,9 @@ def main(page: ft.Page):
 
     page.on_route_change = route_change
     page.on_view_pop = view_pop
+    page.theme = ft.Theme(
+        color_scheme_seed=ft.colors.YELLOW,
+    )
     page.go(page.route)
 
 ft.app(target=main)
