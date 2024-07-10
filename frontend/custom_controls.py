@@ -64,8 +64,10 @@ class AppBar(ft.AppBar):
         self.leading_width = 40
         self.center_title = False
         self.bgcolor = ft.colors.SURFACE_VARIANT
+        self.theme_mode_icon_button = ft.IconButton(ft.icons.LIGHT_MODE_ROUNDED if page.theme_mode == ft.ThemeMode.LIGHT else ft.icons.DARK_MODE_ROUNDED,
+                                                    on_click=self.change_theme_mode)
         self.actions = [
-            ft.IconButton(ft.icons.WB_SUNNY_OUTLINED),
+            self.theme_mode_icon_button,
             ft.IconButton(ft.icons.FILTER_3),
             ft.PopupMenuButton(
                 items=[
@@ -78,3 +80,10 @@ class AppBar(ft.AppBar):
             ),
         ]
         self.page = page        
+
+    def change_theme_mode(self, e):
+        # print(type(e))
+        self.page.theme_mode = ft.ThemeMode.DARK if self.page.theme_mode == ft.ThemeMode.LIGHT else ft.ThemeMode.LIGHT
+        # change icon
+        self.theme_mode_icon_button.icon = ft.icons.LIGHT_MODE_ROUNDED if self.page.theme_mode == ft.ThemeMode.LIGHT else ft.icons.DARK_MODE_ROUNDED
+        self.page.update()
