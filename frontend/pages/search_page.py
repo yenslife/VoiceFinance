@@ -33,18 +33,45 @@ def search_page(page: ft.Page):
     search_bar = ft.TextField(
         label="Search",
         on_change=search,
-        width=600
+        width=400
     )
 
     search(None)
-
-    header_row = ft.Row([
-        ft.Text("Name", weight=ft.FontWeight.BOLD, width=100),
-        ft.Text("Amount", weight=ft.FontWeight.BOLD, width=100),
-        ft.Text("Location", weight=ft.FontWeight.BOLD, width=150),
-        ft.Text("Date", weight=ft.FontWeight.BOLD, width=100),
-        ft.Text("Create At", weight=ft.FontWeight.BOLD, width=150),
-        ft.Text("Note", weight=ft.FontWeight.BOLD, width=100)
+    screen_size_setting = {"sm": 1.7, "md": 1.7}
+    header_row = ft.ResponsiveRow([
+        ft.Container(
+            ft.Text("Name", weight=ft.FontWeight.BOLD, width=80),
+            col=screen_size_setting
+        ),
+        ft.Container(
+            ft.Text("Amount", weight=ft.FontWeight.BOLD, width=80),
+            col=screen_size_setting
+        ),
+        ft.Container(
+            ft.Text("Location", weight=ft.FontWeight.BOLD, width=80),
+            col=screen_size_setting
+        ),
+        ft.Container(
+            ft.Text("Date", weight=ft.FontWeight.BOLD, width=100),
+            col=screen_size_setting
+        ),
+        ft.Container(
+            ft.Text("Create At", weight=ft.FontWeight.BOLD, width=100),
+            col=screen_size_setting
+        ),
+        ft.Container(
+            ft.Text("Note", weight=ft.FontWeight.BOLD, width=80),
+            col=screen_size_setting
+        ),
+        ft.Container(
+            ft.Text("Action", weight=ft.FontWeight.BOLD, width=80),
+            col=screen_size_setting
+        )
+        # ft.Text("Amount", weight=ft.FontWeight.BOLD, width=80),
+        # ft.Text("Location", weight=ft.FontWeight.BOLD, width=80),
+        # ft.Text("Date", weight=ft.FontWeight.BOLD, width=100),
+        # ft.Text("Create At", weight=ft.FontWeight.BOLD, width=100),
+        # ft.Text("Note", weight=ft.FontWeight.BOLD, width=80)
     ])
 
     view_list = [ appbar,
