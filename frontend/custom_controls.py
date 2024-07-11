@@ -41,8 +41,8 @@ class Item(ft.ResponsiveRow):
             self.amount_text_card,
             self.location_text_card,
             self.date_text_card,
-            self.create_at_text_card,
             self.note_text_card,
+            self.create_at_text_card,
             self.edit_button_container,
         ]
 
@@ -55,7 +55,7 @@ class Item(ft.ResponsiveRow):
         self.controls.remove(self.location_text_card)
         self.controls.insert(3, self.date_edit_card)
         self.controls.remove(self.date_text_card)
-        self.controls.insert(4, self.note_edit_card)
+        self.controls.insert(5, self.note_edit_card)
         self.controls.remove(self.note_text_card)
         self.controls.insert(-1, self.save_button_container)
         self.controls.remove(self.edit_button_container)
@@ -70,7 +70,7 @@ class Item(ft.ResponsiveRow):
         self.controls.remove(self.location_edit_card)
         self.controls.insert(3, self.date_text_card)
         self.controls.remove(self.date_edit_card)
-        self.controls.insert(4, self.note_text_card)
+        self.controls.insert(5, self.note_text_card)
         self.controls.remove(self.note_edit_card)
         self.controls.insert(-1, self.edit_button_container)
         self.controls.remove(self.save_button_container)
