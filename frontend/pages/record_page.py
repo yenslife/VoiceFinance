@@ -68,7 +68,7 @@ def recording_page(page: ft.Page):
         }
         response = requests.post(url, params=params)
         print(response.json())
-        if query_text_field.value != "":
+        if query_text_field.value != "" and response.json()["message"] != "Not accounting!":
             result_table.controls.pop(1)
             result_table.controls.insert(1, ft.ResponsiveRow(
                 [
@@ -80,8 +80,14 @@ def recording_page(page: ft.Page):
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
             ))
-        elif query_text_field.value == "":
-            result_table.rows = []
+        elif query_text_field.value != "" and response.json()["message"] == "Not accounting!":
+            result_table.controls.pop(1)
+            result_table.controls.insert(1, ft.Text("無法解析"))
+            hint_snackbar.content = ft.Text("無法解析")
+            hint_snackbar.open = True
+        else:
+            hint_snackbar.content = ft.Text("請先進行錄音!!!")
+            hint_snackbar.open = True
         page.update()
 
     def add_to_db(e):
@@ -97,36 +103,38 @@ def recording_page(page: ft.Page):
             }
         except IndexError:
             print("no data")
-            add_to_db_snackbar.content = ft.Text("請先進行解析!!!")
-            add_to_db_snackbar.open = True
+            hint_snackbar.content = ft.Text("請先進行解析!!!")
+            hint_snackbar.open = True
             page.update()
             return
         response = requests.post(url, json=json_data)
         if response.status_code == 200:
             print(f"add to db: {json_data}")
-            add_to_db_snackbar.content = ft.Text("加入資料庫成功")
-            add_to_db_snackbar.open = True
+            hint_snackbar.content = ft.Text("加入資料庫成功")
+            hint_snackbar.open = True
         else:
-            add_to_db_snackbar.content = ft.Text("加入資料庫失敗")
-            add_to_db_snackbar.open = True
+            hint_snackbar.content = ft.Text("加入資料庫失敗")
+            hint_snackbar.open = True
         page.update()
 
     def start_recording(e):
         global is_recording
-        if is_recording:
-            return
-        is_recording = True
-        threading.Thread(target=start_recording_thread, args=(query_text_field, page)).start()
-    
-    def stop_recording(e):
-        global is_recording, result_text
-        is_recording = False
-        print("stop recording")
+        if not is_recording:
+            start_recording_btn.text = "停止"
+            start_hint_text.value = "錄音中..."
+            page.update()
+            if is_recording:
+                return
+            is_recording = True
+            threading.Thread(target=start_recording_thread, args=(query_text_field, page)).start()
+        else:
+            is_recording = False
+            start_recording_btn.text = "開始錄音"
+            start_hint_text.value = "請錄下你的花費以及時間"
 
     # text veiw
     appbar = AppBar(page=page)
     start_hint_text = ft.Text("請錄下你的花費以及時間", size=18)
-    end_hint_text = ft.Text("當錄音結束，按下這個按鈕", size=18)
     query_text_field = ft.TextField("我昨天買了五隻筆，花了九十塊")
     result_table = ft.Column(
         [
@@ -147,12 +155,12 @@ def recording_page(page: ft.Page):
 
     # calculate button
     start_recording_btn = ft.ElevatedButton(text=f"start recording", width=630, on_click=start_recording)
-    stop_recording_btn = ft.ElevatedButton(text=f"stop recording", width=630, on_click=stop_recording)
+    # stop_recording_btn = ft.ElevatedButton(text=f"stop recording", width=630, on_click=stop_recording)
     analysis_btn = ft.ElevatedButton(text=f"解析", width=630, on_click=analysis)
     add_to_db_btn = ft.ElevatedButton(text=f"加入資料庫", width=630, on_click=add_to_db)
 
     # snackbar
-    add_to_db_snackbar = ft.SnackBar(ft.Text("加入資料庫成功"), action="關閉")
+    hint_snackbar = ft.SnackBar(ft.Text("加入資料庫成功"), action="關閉")
     
     page.views.append(
         ft.View(
@@ -161,8 +169,6 @@ def recording_page(page: ft.Page):
                 appbar,
                 start_hint_text,
                 start_recording_btn,
-                end_hint_text,
-                stop_recording_btn,
                 ft.ResponsiveRow(
                     [
                         ft.Text("輸入文字："),
@@ -174,7 +180,7 @@ def recording_page(page: ft.Page):
                 analysis_btn,
                 result_table,
                 add_to_db_btn,
-                add_to_db_snackbar
+                hint_snackbar
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.CENTER

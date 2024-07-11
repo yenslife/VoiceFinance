@@ -8,7 +8,7 @@ from pages.search_page import search_page
 # GUI part
 def main(page: ft.Page):
     # GUI的排版
-    page.title = "Taiwan High Speed Rail Fare System"
+    page.title = "Voice Finance 你的語音記帳系統"
     page.window_width = 850
     page.window_height = 600
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
