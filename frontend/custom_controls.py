@@ -35,6 +35,7 @@ class Item(ft.ResponsiveRow):
         self.edit_button_container = ft.Container(self.edit_button, col=self.screen_size_setting,padding=ft.padding.all(10))
         self.save_button_container = ft.Container(self.save_button, col=self.screen_size_setting,padding=ft.padding.all(10))
         self.alignment = ft.MainAxisAlignment.CENTER
+        self.vertical_alignment = ft.CrossAxisAlignment.CENTER
         self.controls = [
             # ft.Checkbox(),
             self.name_text_card,
