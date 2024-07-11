@@ -26,7 +26,11 @@ def search_page(page: ft.Page):
                             create_at=item['create_at'], 
                             id=item['id'],
                             note=item['note'])
-            items.append(item_obj)
+            items.append(ft.Container(item_obj, 
+                                      border=ft.border.all(1),
+                                      border_radius=ft.border_radius.all(10),
+                                      padding=ft.padding.all(1),
+                                      margin=ft.margin.all(10)),)
         item_list_view.controls.extend(items)
         page.update()
 

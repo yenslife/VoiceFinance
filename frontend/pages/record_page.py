@@ -69,31 +69,30 @@ def recording_page(page: ft.Page):
         response = requests.post(url, params=params)
         print(response.json())
         if query_text_field.value != "":
-            result_table.rows = [
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text(response.json()["message"]['item'])),
-                        ft.DataCell(ft.Text(response.json()["message"]['date'])),
-                        ft.DataCell(ft.Text(response.json()["message"]['amount'])),
-                        ft.DataCell(ft.Text(response.json()["message"]['location'])),
-                        ft.DataCell(ft.Text(response.json()["message"]['note'])),
-                    ],
-                )
-            ]
+            result_table.controls.pop(1)
+            result_table.controls.insert(1, ft.ResponsiveRow(
+                [
+                    ft.Container(ft.Text(response.json()["message"]['item']), col=2.4),
+                    ft.Container(ft.Text(response.json()["message"]['date']), col=2.4),
+                    ft.Container(ft.Text(response.json()["message"]['amount']), col=2.4),
+                    ft.Container(ft.Text(response.json()["message"]['location']), col=2.4),
+                    ft.Container(ft.Text(response.json()["message"]['note']), col=2.4)
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+            ))
         elif query_text_field.value == "":
             result_table.rows = []
         page.update()
 
     def add_to_db(e):
         url = API_URL + "/items"
-        print(result_table)
         try:
             json_data = {
-                "name": result_table.rows[0].cells[0].content.value,
-                "date": result_table.rows[0].cells[1].content.value,
-                "amount": result_table.rows[0].cells[2].content.value,
-                "location": result_table.rows[0].cells[3].content.value,
-                "note": result_table.rows[0].cells[4].content.value,
+                "name": result_table.controls[1].controls[0].content.value,
+                "date": result_table.controls[1].controls[1].content.value,
+                "amount": result_table.controls[1].controls[2].content.value,
+                "location": result_table.controls[1].controls[3].content.value,
+                "note": result_table.controls[1].controls[4].content.value,
                 "create_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
         except IndexError:
@@ -129,15 +128,21 @@ def recording_page(page: ft.Page):
     start_hint_text = ft.Text("請錄下你的花費以及時間", size=18)
     end_hint_text = ft.Text("當錄音結束，按下這個按鈕", size=18)
     query_text_field = ft.TextField("我昨天買了五隻筆，花了九十塊")
-    result_table = ft.DataTable(
-        columns=[
-            ft.DataColumn(ft.Text("Item")),
-            ft.DataColumn(ft.Text("Date")),
-            ft.DataColumn(ft.Text("Amount")),
-            ft.DataColumn(ft.Text("Location")),
-            ft.DataColumn(ft.Text("Note"))
+    result_table = ft.Column(
+        [
+            ft.ResponsiveRow(
+                [
+                    ft.Container(ft.Text("Item"), col=2.4),
+                    ft.Container(ft.Text("Date"), col=2.4),
+                    ft.Container(ft.Text("Amount"), col=2.4),
+                    ft.Container(ft.Text("Location"), col=2.4),
+                    ft.Container(ft.Text("Note"), col=2.4)
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+            ),
+            ft.ResponsiveRow(alignment=ft.MainAxisAlignment.CENTER)
         ],
-        rows=[]
+        width=630
     )
 
     # calculate button
@@ -158,12 +163,13 @@ def recording_page(page: ft.Page):
                 start_recording_btn,
                 end_hint_text,
                 stop_recording_btn,
-                ft.Row(
+                ft.ResponsiveRow(
                     [
                         ft.Text("輸入文字："),
                         query_text_field
                     ],
-                    alignment=ft.MainAxisAlignment.CENTER
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    width=630
                 ),
                 analysis_btn,
                 result_table,
